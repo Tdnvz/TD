@@ -10,78 +10,100 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f4f4f4;
-            color: #333;
-            direction: rtl;
-            transition: background 0.3s, color 0.3s;
+            transition: background 0.5s, color 0.5s;
         }
         .container {
-            width: 80%;
-            margin: auto;
+            max-width: 600px;
+            margin: 50px auto;
             padding: 20px;
-            background: white;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .dark-mode {
-            background-color: #222;
-            color: white;
-        }
-        .btn {
+        .theme-button {
             margin: 10px;
             padding: 10px 20px;
-            cursor: pointer;
             border: none;
+            cursor: pointer;
             border-radius: 5px;
         }
-        .btn-dark {
-            background: black;
-            color: white;
+        .theme-light {
+            background: #f9f9f9;
+            color: #333;
         }
-        textarea {
-            width: 100%;
-            height: 200px;
+        .theme-dark {
+            background: #333;
+            color: #f9f9f9;
+        }
+        .theme-blue {
+            background: #007BFF;
+            color: #fff;
+        }
+        .theme-green {
+            background: #28a745;
+            color: #fff;
+        }
+        .chatbox {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background: white;
+        }
+        .chat-input {
+            width: 80%;
+            padding: 10px;
             margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
         }
     </style>
 </head>
-<body>
-    <button class="btn btn-dark" onclick="toggleDarkMode()">تغییر تم</button>
-    <button class="btn" onclick="generateSchedule()">تولید برنامه روزانه</button>
+<body class="theme-light">
     <div class="container">
-        <h1>برنامه روزانه شما</h1>
-        <h2>روزهای عادی</h2>
-        <ul id="daily-schedule">
-        </ul>
-        <h2>روزهای تعطیل</h2>
-        <ul id="holiday-schedule">
-        </ul>
+        <h1>برنامه روزانه</h1>
+        <p>برنامه‌ای برای مدیریت بهتر روز</p>
+        <button class="theme-button" onclick="changeTheme('theme-light')">روشن</button>
+        <button class="theme-button" onclick="changeTheme('theme-dark')">تاریک</button>
+        <button class="theme-button" onclick="changeTheme('theme-blue')">آبی</button>
+        <button class="theme-button" onclick="changeTheme('theme-green')">سبز</button>
+        
+        <div class="chatbox" id="chatbox">
+            <p><strong>ChatGPT:</strong> سلام! چه کمکی از دستم برمیاد؟</p>
+        </div>
+        <input type="text" id="userInput" class="chat-input" placeholder="پیامت رو بنویس..." />
+        <button class="theme-button" onclick="sendMessage()">ارسال</button>
     </div>
+    
     <script>
-        function toggleDarkMode() {
-            document.body.classList.toggle("dark-mode");
+        function changeTheme(theme) {
+            document.body.className = theme;
         }
-
-        function generateSchedule() {
-            const dailySchedule = [
-                "۶:۰۰ صبح - بیدار شدن و آماده‌سازی روزانه",
-                "۷:۰۰ تا ۱۳:۳۰ - مدرسه",
-                "۱۵:۰۰ تا ۱۶:۳۰ - مطالعه و تکالیف",
-                "۱۶:۳۰ تا ۱۷:۳۰ - بازی و تفریح",
-                "۱۸:۰۰ تا ۱۹:۰۰ - ورزش و ۱۰۰ شنا",
-                "۱۹:۰۰ تا ۱۹:۳۰ - مطالعه ۱۰ صفحه کتاب"
-            ];
-
-            const holidaySchedule = [
-                "۸:۳۰ - بیدار شدن",
-                "۹:۰۰ تا ۱۰:۰۰ - یادگیری شخصی",
-                "۱۰:۰۰ تا ۱۱:۰۰ - ورزش و شنا",
-                "۱۶:۳۰ تا ۱۷:۳۰ - بازی یا تفریح",
-                "۱۹:۰۰ تا ۱۹:۳۰ - مطالعه ۱۰ صفحه دیگر کتاب"
-            ];
-
-            document.getElementById("daily-schedule").innerHTML = dailySchedule.map(item => `<li>${item}</li>`).join('');
-            document.getElementById("holiday-schedule").innerHTML = holidaySchedule.map(item => `<li>${item}</li>`).join('');
+        
+        async function sendMessage() {
+            let userInput = document.getElementById("userInput").value;
+            let chatbox = document.getElementById("chatbox");
+            
+            if (userInput.trim() === "") return;
+            
+            chatbox.innerHTML += `<p><strong>شما:</strong> ${userInput}</p>`;
+            document.getElementById("userInput").value = "";
+            
+            let response = await fetch("https://api.openai.com/v1/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer YOUR_OPENAI_API_KEY"
+                },
+                body: JSON.stringify({
+                    model: "text-davinci-003",
+                    prompt: userInput,
+                    max_tokens: 100
+                })
+            });
+            
+            let data = await response.json();
+            let botMessage = data.choices[0].text.trim();
+            chatbox.innerHTML += `<p><strong>ChatGPT:</strong> ${botMessage}</p>`;
         }
     </script>
 </body>
