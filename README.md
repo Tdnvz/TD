@@ -108,3 +108,6 @@
     </script>
 </body>
 </html>
+const openai = new OpenAI({
+  apiKey: "YOUR_OPENAI_API_KEY", //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
+});
