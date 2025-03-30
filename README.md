@@ -1,7 +1,6 @@
 # TD
 برای برانامه ریزی روزانه
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState } from "reacimport { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectItem } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
