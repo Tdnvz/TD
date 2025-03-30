@@ -1,5 +1,12 @@
 # TD
 برای برانامه ریزی روزانه
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
+git push -u origin main
+
 import { useState } from "reacimport { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectItem } from "@/components/ui/select";
