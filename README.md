@@ -1,113 +1,74 @@
 # TD
 برای برانامه ریزی روزانه
-<!DOCTYPE html>
-<html lang="fa">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>برنامه روزانه</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            transition: background 0.5s, color 0.5s;
-        }
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .theme-button {
-            margin: 10px;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .theme-light {
-            background: #f9f9f9;
-            color: #333;
-        }
-        .theme-dark {
-            background: #333;
-            color: #f9f9f9;
-        }
-        .theme-blue {
-            background: #007BFF;
-            color: #fff;
-        }
-        .theme-green {
-            background: #28a745;
-            color: #fff;
-        }
-        .chatbox {
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            background: white;
-        }
-        .chat-input {
-            width: 80%;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-    </style>
-</head>
-<body class="theme-light">
-    <div class="container">
-        <h1>برنامه روزانه</h1>
-        <p>برنامه‌ای برای مدیریت بهتر روز</p>
-        <button class="theme-button" onclick="changeTheme('theme-light')">روشن</button>
-        <button class="theme-button" onclick="changeTheme('theme-dark')">تاریک</button>
-        <button class="theme-button" onclick="changeTheme('theme-blue')">آبی</button>
-        <button class="theme-button" onclick="changeTheme('theme-green')">سبز</button>
-        
-        <div class="chatbox" id="chatbox">
-            <p><strong>ChatGPT:</strong> سلام! چه کمکی از دستم برمیاد؟</p>
-        </div>
-        <input type="text" id="userInput" class="chat-input" placeholder="پیامت رو بنویس..." />
-        <button class="theme-button" onclick="sendMessage()">ارسال</button>
-    </div>
-    
-    <script>
-        function changeTheme(theme) {
-            document.body.className = theme;
-        }
-        
-        async function sendMessage() {
-            let userInput = document.getElementById("userInput").value;
-            let chatbox = document.getElementById("chatbox");
-            
-            if (userInput.trim() === "") return;
-            
-            chatbox.innerHTML += `<p><strong>شما:</strong> ${userInput}</p>`;
-            document.getElementById("userInput").value = "";
-            
-            let response = await fetch("https://api.openai.com/v1/completions", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer YOUR_OPENAI_API_KEY"
-                },
-                body: JSON.stringify({
-                    model: "text-davinci-003",
-                    prompt: userInput,
-                    max_tokens: 100
-                })
-            });
-            
-            let data = await response.json();
-            let botMessage = data.choices[0].text.trim();
-            chatbox.innerHTML += `<p><strong>ChatGPT:</strong> ${botMessage}</p>`;
-        }
-    </script>
-</body>
-</html>
-const openai = new OpenAI({
-  apiKey: "YOUR_OPENAI_API_KEY", //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
-});
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectItem } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { motion } from "framer-motion";
+
+const colors = [
+  "red", "blue", "green", "yellow", "purple", "orange", "pink",
+  "brown", "gray", "cyan", "lime", "indigo", "teal", "olive", "navy",
+  "maroon", "gold", "silver", "black", "white", "violet", "magenta", "coral",
+  "salmon", "khaki", "plum", "orchid", "turquoise", "lavender", "beige"
+];
+
+export default function DailyPlanner() {
+  const [bgColor, setBgColor] = useState("white");
+  const [tasks, setTasks] = useState({});
+  const [completedTasks, setCompletedTasks] = useState({});
+  const [day, setDay] = useState("Monday");
+
+  const handleTaskChange = (e) => {
+    setTasks({ ...tasks, [day]: e.target.value });
+  };
+
+  const toggleTaskCompletion = () => {
+    setCompletedTasks({ ...completedTasks, [day]: !completedTasks[day] });
+  };
+
+  const generatePlan = async () => {
+    const response = await fetch("https://api.openai.com/v1/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer YOUR_OPENAI_API_KEY`
+      },
+      body: JSON.stringify({
+        model: "gpt-4",
+        prompt: `یک برنامه روزانه برای ${day} پیشنهاد بده که شامل کارهای مفید باشد.`,
+        max_tokens: 100
+      })
+    });
+    const data = await response.json();
+    setTasks({ ...tasks, [day]: data.choices[0].text });
+  };
+
+  return (
+    <motion.div className="min-h-screen flex flex-col items-center p-6" animate={{ backgroundColor: bgColor }}>
+      <h1 className="text-3xl font-bold mb-4">برنامه روزانه</h1>
+      <Select value={day} onChange={setDay} className="mb-4">
+        {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map(d => (
+          <SelectItem key={d} value={d}>{d}</SelectItem>
+        ))}
+      </Select>
+      <Select value={bgColor} onChange={setBgColor} className="mb-4">
+        {colors.map(color => (
+          <SelectItem key={color} value={color}>{color}</SelectItem>
+        ))}
+      </Select>
+      <Card className="w-full max-w-md p-4">
+        <CardContent>
+          <Textarea value={tasks[day] || ""} onChange={handleTaskChange} placeholder="برنامه خود را وارد کنید" />
+          <div className="flex items-center mt-2">
+            <Checkbox checked={completedTasks[day] || false} onCheckedChange={toggleTaskCompletion} />
+            <span className="ml-2">انجام شد</span>
+          </div>
+          <Button onClick={generatePlan} className="mt-4">برنامه پیشنهادی</Button>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
