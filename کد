@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>برنامه روزانه</title>
+    <style>
+        body {
+            font-family: 'Tahoma', sans-serif;
+            text-align: center;
+            direction: rtl;
+            background-color: #f5f5f5;
+            transition: background-color 0.5s;
+        }
+        #colorPicker {
+            margin: 10px;
+            padding: 5px;
+        }
+        #tasks {
+            max-width: 400px;
+            margin: auto;
+            text-align: right;
+        }
+        .task {
+            display: flex;
+            justify-content: space-between;
+            background: white;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px gray;
+        }
+        .done {
+            text-decoration: line-through;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>برنامه روزانه</h1>
+    
+    <label for="colorPicker">رنگ پس‌زمینه:</label>
+    <select id="colorPicker"></select>
+
+    <h2 id="dayTitle"></h2>
+    <div id="tasks"></div>
+
+    <button onclick="viewPreviousDay()">مشاهده برنامه دیروز</button>
+
+    <script>
+        const colors = [
+            "#f5f5f5", "#ffadad", "#ffd6a5", "#fdffb6", "#caffbf", "#9bf6ff", "#a0c4ff",
+            "#bdb2ff", "#ffc6ff", "#d6d6d6", "#a8dadc", "#ffafcc", "#6a4c93", "#ffbe0b",
+            "#ff006e", "#8338ec", "#3a86ff", "#06d6a0", "#118ab2", "#073b4c", "#ef476f",
+            "#f78c6b", "#e9c46a", "#2a9d8f", "#264653", "#8ac926", "#1982c4", "#6a0572",
+            "#ff7f50", "#40e0d0"
+        ];
+
+        const colorPicker = document.getElementById("colorPicker");
+        colors.forEach(color => {
+            let option = document.createElement("option");
+            option.value = color;
+            option.textContent = color;
+            option.style.backgroundColor = color;
+            colorPicker.appendChild(option);
+        });
+
+        colorPicker.addEventListener("change", function() {
+            document.body.style.backgroundColor = this.value;
+        });
+
+        const tasksByDay = {
+            "شنبه": ["مطالعه یک ساعت", "ورزش ۳۰ دقیقه", "یادگیری زبان"],
+            "یکشنبه": ["نوشتن برنامه روزانه", "انجام مدیتیشن", "تمرین کدنویسی"],
+            "دوشنبه": ["پیاده‌روی", "مرور درس‌ها", "تماشای یک مستند"],
+            "سه‌شنبه": ["حل تمرین برنامه‌نویسی", "مرتب کردن اتاق", "گوش دادن به پادکست"],
+            "چهارشنبه": ["خرید مواد غذایی", "نوشتن یک مقاله", "شرکت در یک وبینار"],
+            "پنج‌شنبه": ["تمرین موسیقی", "مطالعه یک مقاله علمی", "تمرین یوگا"],
+            "جمعه": ["دیدار با دوستان", "مرور هفته", "برنامه‌ریزی برای هفته آینده"]
+        };
+
+        function getPersianDay(index) {
+            return Object.keys(tasksByDay)[index];
+        }
+
+        let todayIndex = new Date().getDay();
+        let todayName = getPersianDay(todayIndex);
+        let yesterdayName = getPersianDay((todayIndex - 1 + 7) % 7);
+
+        document.getElementById("dayTitle").innerText = `برنامه روز ${todayName}`;
+        
+        function loadTasks(day) {
+            let taskList = document.getElementById("tasks");
+            taskList.innerHTML = "";
+            tasksByDay[day].forEach(task => {
+                let taskDiv = document.createElement("div");
+                taskDiv.className = "task";
+                taskDiv.innerHTML = `
+                    <span>${task}</span>
+                    <input type="checkbox" onclick="toggleTask(this)">
+                `;
+                taskList.appendChild(taskDiv);
+            });
+        }
+
+        function toggleTask(checkbox) {
+            let taskText = checkbox.parentElement.querySelector("span");
+            if (checkbox.checked) {
+                taskText.classList.add("done");
+            } else {
+                taskText.classList.remove("done");
+            }
+        }
+
+        function viewPreviousDay() {
+            document.getElementById("dayTitle").innerText = `برنامه روز ${yesterdayName}`;
+            loadTasks(yesterdayName);
+        }
+
+        loadTasks(todayName);
+    </script>
+
+</body>
+</html>
